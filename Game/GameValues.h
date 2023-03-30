@@ -6,8 +6,8 @@
 #define game_arena_pipe_distance 3.f
 #define game_arena_snake_speed 1.5f
 #define game_arena_snake_nb 20
-#define game_arena_width 10.f
-#define game_arena_height 10.f
+#define game_arena_width 20.f
+#define game_arena_height 20.f
 #define game_arena_floor_y 0.f
 
 #define game_arena_food_nb 20

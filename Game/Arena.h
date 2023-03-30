@@ -21,10 +21,11 @@ public:
     void checkCollision(Snake* s);
 private:
     Food foods[game_arena_food_nb]; 
-    Model* ground;
+    Mesh *ground;
+    Model *wall;
     Model* food;
+    Texture* dirtTexture;
     Texture* brickTexture;
-    int incoming_pipe_id;
 };
 
 #endif

@@ -14,10 +14,12 @@ FIND_PACKAGE(GLEW REQUIRED)
 find_package(glm REQUIRED)
 find_package(assimp REQUIRED)
 find_library(SOIL2 soil2-debug)
+FIND_PACKAGE(GLUT REQUIRED)
 
 include_directories( ${OpenCV_INCLUDE_DIRS} )
 include_directories(${GLEW_INCLUDE_DIRS})
 include_directories(${GLM_INCLUDE_DIRS})
+include_directories(${GLUT_INCLUDE_DIRS})
 
 SET(SOURCE_FILES 
 
@@ -50,3 +52,4 @@ ADD_EXECUTABLE(project ${SOURCE_FILES})
 TARGET_LINK_LIBRARIES(project glfw)
 TARGET_LINK_LIBRARIES(project OpenGL::GL GLEW::GLEW glm assimp)
 target_link_libraries(project rt ${OpenCV_LIBS} pthread)
+TARGET_LINK_LIBRARIES(project ${GLUT_LIBRARIES} ${OPENGL_glu_LIBRARY})

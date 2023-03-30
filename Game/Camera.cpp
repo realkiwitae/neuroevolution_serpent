@@ -80,8 +80,8 @@ void Camera::update()
 	right = glm::normalize(glm::cross(front, worldUp));
 	up = glm::normalize(glm::cross(right, front));
 
-	std::cout <<"pos("<<position.x << "," << position.y<<" " << position.z << " ";
-	std::cout <<"yaw " << yaw << " pitch " << pitch << std::endl;
+	// std::cout <<"pos("<<position.x << "," << position.y<<" " << position.z << " ";
+	// std::cout <<"yaw " << yaw << " pitch " << pitch << std::endl;
 }
 
 
