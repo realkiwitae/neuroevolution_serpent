@@ -15,32 +15,32 @@
 
 class Snake
 {
+
+struct Segment{
+    public:
+    glm::vec2 pos = glm::vec2(0,0);
+
+};
+
 public:
     Snake();
     ~Snake();
 
     void init(Model* model);
     void update();
+    void update(glm::vec2 change);
     void render(GLuint uniformModel, GLuint uniformSpecularIntensity, GLuint uniformShininess);
-    void setbUp(bool val){bUp = val;}
     void kill();
     bool isDead(){return !bIsAlive;}
-    glm::vec2 getPos(){return pos;}
-    GLfloat getCollisionW(){return collision_w;}
-    GLfloat getCollisionH(){return collision_h;}
-
+    glm::vec2 getScreenCoord();
+    glm::vec2 getPos(){return body[0].pos;}
     void possess(DNA* dna);
     void addScore(GLfloat s);
 private:
-    Model* model_snake;
-    //Physics
-    glm::vec2 pos;
-    GLfloat speed = 0.f;
-    GLfloat mass = 2.f;
-    GLfloat maxspeed = 10.f;// ms-1
-    GLfloat collision_w = 1.f;
-    GLfloat collision_h = .5f;
-    bool bUp = false;
+    Model* model_segment;
+    std::vector<Segment> body = {};
+    glm::vec2 dir;
+    GLfloat speed = game_arena_snake_speed;
     bool bIsAlive = true;
     GLfloat birth = 0.f;
     GLfloat score = 0.f;

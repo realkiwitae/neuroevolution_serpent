@@ -41,7 +41,7 @@ int Window::Initialise()
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
 	// Create the window
-	mainWindow = glfwCreateWindow(width, height, "Test Window", NULL, NULL);
+	mainWindow = glfwCreateWindow(width, height, "Snake Arena", NULL, NULL);
 	if (!mainWindow)
 	{
 		printf("Error creating GLFW window!");
@@ -137,6 +137,8 @@ void Window::handleMouse(GLFWwindow* window, double xPos, double yPos)
 
 	theWindow->lastX = xPos;
 	theWindow->lastY = yPos;
+
+	theWindow->setMousePos(xPos,yPos);
 }
 
 Window::~Window()

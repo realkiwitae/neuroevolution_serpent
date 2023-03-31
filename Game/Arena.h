@@ -26,6 +26,7 @@ private:
     Model* food;
     Texture* dirtTexture;
     Texture* brickTexture;
+
 };
 
 #endif

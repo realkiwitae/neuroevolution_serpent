@@ -18,13 +18,13 @@ public:
     void init(Model* _Food);
     void update();
     void render(GLuint uniformModel, GLuint uniformSpecularIntensity, GLuint uniformShininess);
-    void checkCollision(Snake* b);
+    bool checkCollision(double x, double y, double r);
     glm::vec2 getPos(){return pos;}
+    bool collected = false;
 private:
     glm::vec2 pos;
     GLfloat size_food_radius;
     Model* food;
-    GLfloat gap; 
     int id = 0;
 };
 

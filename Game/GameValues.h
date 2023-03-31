@@ -13,7 +13,7 @@
 #define game_arena_food_nb 20
 #define game_arena_food_radius .5f
 
-#define game_snake_segment_radius .5f
+#define game_snake_segment_radius .2f
 #define game_snake_maxhealth 20.f
 
 #define game_snakenn_nb_layers 3

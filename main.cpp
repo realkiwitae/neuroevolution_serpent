@@ -42,7 +42,12 @@
 
 #include "./kiwinn/GeneticPool.h"
 
+#define NEURO_EVOL_ACTIVE false
+
 extern GLfloat now,deltaTime,lastTime;
+extern Camera camera;
+extern glm::mat4 projection;
+extern Window mainWindow;
 
 GLuint WIDTH = 1366;
 GLuint HEIGHT = 768;
@@ -50,13 +55,11 @@ GLuint HEIGHT = 768;
 GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0, uniformEyePosition = 0,
 uniformSpecularIntensity = 0, uniformShininess = 0, uniformOmniLightPos = 0, uniformFarPlane = 0;
 
-Window mainWindow;
+glm::vec2 mouse_move;
 std::vector<Mesh*> meshList;
 std::vector<Shader> shaderList;
 Shader directionalShadowShader;
 Shader omniShadowShader;
-
-Camera camera;
 
 Texture brickTexture;
 Texture dirtTexture;
@@ -69,6 +72,7 @@ Material dullMaterial;
 Model* model_snake;
 
 Snake snakeNNs[game_snakenn_pool_size];
+Snake player;
 GeneticPool genom;
 int nb_alive = 0;
 Arena arena;
@@ -134,6 +138,8 @@ void CreateObjects()
 		snakeNNs[i].init(model_snake);
 		snakeNNs[i].possess(genom.getDNA(i));
 	}
+	player  = Snake();
+	player.init(model_snake);
 	arena.init();
 }
 
@@ -153,11 +159,14 @@ void RenderScene()
 {
 
 	arena.render(uniformModel,uniformSpecularIntensity,uniformShininess);
+#if NEURO_EVOL_ACTIVE
 	for(size_t i = 0 ; i < game_snakenn_pool_size; i++)
 	{
 		snakeNNs[i].render(uniformModel,uniformSpecularIntensity,uniformShininess);
 	}
-
+#else
+	player.render(uniformModel,uniformSpecularIntensity,uniformShininess);
+#endif
 }
 
 void DirectionalShadowMapPass(DirectionalLight* light)
@@ -250,22 +259,15 @@ void GameLoop(){
 		spotLights[0].Toggle();
 		mainWindow.Toggle(GLFW_KEY_L);
 	}
-
-	//snake.setbUp(CHECK_BIT(*mainWindow.getKeys(),GLFW_KEY_SPACE));
 	
-	if(arena.update()){
-		for(size_t i = 0 ; i < game_snakenn_pool_size; i++)
-		{
-			snakeNNs[i].addScore(1.f);
-		}
-	}
+	arena.update();
 
+#if NEURO_EVOL_ACTIVE
 	for(size_t i = 0 ; i < game_snakenn_pool_size; i++)
 	{
 		snakeNNs[i].update();
 
 	}
-
 	//check collisions
 	nb_alive = 0;
 	for(size_t i = 0 ; i < game_snakenn_pool_size; i++)
@@ -283,6 +285,12 @@ void GameLoop(){
 		}
 		arena.init();
 	}
+#else
+// normal game
+
+	player.update();
+
+#endif
 }
 
 int main() 
@@ -353,8 +361,8 @@ int main()
 
 	skybox = Skybox("cupertin-lake");
 
-	glm::mat4 projection = glm::perspective(glm::radians(60.0f), (GLfloat)mainWindow.getBufferWidth() / mainWindow.getBufferHeight(), 0.1f, 100.0f);
-	//glm::mat4 projection = glm::ortho(-5.f,5.f,-5.f,5.f,-5.f,5.f);
+	projection = glm::perspective(glm::radians(60.0f), (GLfloat)mainWindow.getBufferWidth() / mainWindow.getBufferHeight(), 0.1f, 100.0f);
+	//projection = glm::ortho(-20.f,20.f,-20.f,20.f,-20.f,20.f);
 
 	// Loop until window closed
 	while (!mainWindow.getShouldClose())
@@ -365,9 +373,9 @@ int main()
 
 		// Get + Handle User Input
 		glfwPollEvents();
-
+		mouse_move = glm::vec2(mainWindow.getXChange(), mainWindow.getYChange());
 		camera.keyControl(mainWindow.getKeys(), deltaTime);
-		camera.mouseControl(mainWindow.getXChange(), mainWindow.getYChange());
+		camera.mouseControl(mouse_move.x,mouse_move.y);
 
 		GameLoop();
 

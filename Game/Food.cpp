@@ -25,7 +25,7 @@ void Food::init(Model* _Food)
     food = _Food;
     pos.x =  glm::linearRand(-game_arena_width/2.f +game_arena_food_radius/2.f,game_arena_width/2.f -game_arena_food_radius/2.f);
     pos.y =  glm::linearRand(-game_arena_height/2.f +game_arena_food_radius/2.f,game_arena_height/2.f -game_arena_food_radius/2.f);
-
+    collected = false;
 }
 
 void Food::update(){
@@ -44,10 +44,6 @@ void Food::render(GLuint uniformModel, GLuint uniformSpecularIntensity, GLuint u
 
 }
 
-void Food::checkCollision(Snake* b){
-    glm::vec2 bird_pos = b->getPos();
-
-    if((b->getPos() - pos).length() < (game_snake_segment_radius+game_arena_food_radius)){
-        b->kill();
-    }
+bool Food::checkCollision(double x, double y, double r){
+    return glm::length(pos - glm::vec2(x,y)) < (r + game_arena_food_radius);
 }

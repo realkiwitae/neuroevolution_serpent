@@ -1,10 +1,16 @@
 #include "./CommonValues.h"
 #include "glm/glm.hpp"
+
+
 bool CHECK_BIT(unsigned long var, int pos){return var & (1UL << pos);}
 
 GLfloat deltaTime = 0.0f;
 GLfloat lastTime = 0.0f;
 GLfloat now = 0.0f;
+glm::mat4 projection;
+Camera camera;
+Window mainWindow;
+
 
 void calcAverageNormals(unsigned int * indices, unsigned int indiceCount, GLfloat * vertices, unsigned int verticeCount, 
 						unsigned int vLength, unsigned int normalOffset)

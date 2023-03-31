@@ -4,6 +4,7 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
 
 class Window
 {
@@ -23,7 +24,8 @@ public:
 	void Toggle(int key);
 	GLfloat getXChange();
 	GLfloat getYChange();
-
+	glm::vec2 getMousePos(){return mouse_pos;}
+	void setMousePos(GLfloat x, GLfloat y){mouse_pos = glm::vec2(x,y);}
 	void swapBuffers() { glfwSwapBuffers(mainWindow); }
 
 	~Window();
@@ -36,6 +38,7 @@ private:
 
 	long keys;
 
+	glm::vec2 mouse_pos;
 	GLfloat lastX;
 	GLfloat lastY;
 	GLfloat xChange;

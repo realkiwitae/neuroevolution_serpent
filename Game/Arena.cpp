@@ -33,6 +33,17 @@ void Arena::init()
     for(size_t i = 0; i < game_arena_food_nb; i++){
         foods[i] = Food(i);
         foods[i].init(food);
+        bool b = true;
+        while(b){
+            b = false;
+            for(size_t j = 0; j < i; j++){
+                if(foods[i].checkCollision(foods[j].getPos().x,foods[j].getPos().y,3*game_arena_food_radius)){
+                    b = true;
+                    foods[i].init(food);
+                    break;
+                }
+            }     
+        }
     }
 
     if(!ground){
@@ -79,6 +90,23 @@ void Arena::init()
 bool Arena::update()
 {
     bool b = false;
+    for(size_t i = 0; i < game_arena_food_nb; i++){
+        if(!foods[i].collected)continue;
+        
+        foods[i] = Food(i);
+        foods[i].init(food);
+        bool b = true;
+        while(b){
+            b = false;
+            for(size_t j = 0; j < i; j++){
+                if(foods[i].checkCollision(foods[j].getPos().x,foods[j].getPos().y,3*game_arena_food_radius)){
+                    b = true;
+                    foods[i].init(food);
+                    break;
+                }
+            }     
+        }
+    }
     return b;
 }
 
@@ -118,10 +146,10 @@ void Arena::render(GLuint uniformModel, GLuint uniformSpecularIntensity, GLuint 
 }
 
 void Arena::checkCollision(Snake* s){
-    if(s->isDead())return;
-    glm::vec2 snake_pos = s->getPos();
+    // if(s->isDead())return;
+    // glm::vec2 snake_pos = s->getPos();
 
-    for(Food& p : foods){
-        p.checkCollision(s);
-    }
+    // for(Food& p : foods){
+    //     p.checkCollision(s);
+    // }
 }
