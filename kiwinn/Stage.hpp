@@ -5,12 +5,13 @@
 #include <stdint.h>
 
 #define MAX_SIZE 500
-	
+#define SIGNAL_MULTIPLIER .1f
+
 class Stage  
 {
 
 public:
-	double signalMultiplier = .1;
+	double signalMultiplier = SIGNAL_MULTIPLIER;
 	Stage* prev;
 	int output_length;
 	double output[MAX_SIZE];

@@ -45,5 +45,7 @@ void Food::render(GLuint uniformModel, GLuint uniformSpecularIntensity, GLuint u
 }
 
 bool Food::checkCollision(double x, double y, double r){
-    return glm::length(pos - glm::vec2(x,y)) < (r + game_arena_food_radius);
+    if(collected)return false;
+    collected |= glm::length(pos - glm::vec2(x,y)) < (r + game_arena_food_radius);
+    return collected;
 }

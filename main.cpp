@@ -93,8 +93,8 @@ static const char* vShader = "Shaders/shader.vert";
 static const char* fShader = "Shaders/shader.frag";
 
 // Video output settings
-const int FPS = 30; // Frames per second
-const int SLEEP_TIME = 1000000/FPS;
+extern const int FPS;
+extern const int SLEEP_TIME;
 const int FOURCC = cv::VideoWriter::fourcc('H','2','6','4'); // Codec to use
 
 GLubyte* image = new GLubyte[WIDTH * HEIGHT * 3];
@@ -289,7 +289,7 @@ void GameLoop(){
 // normal game
 
 	player.update();
-
+	arena.checkCollision(&player);
 #endif
 }
 

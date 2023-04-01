@@ -20,12 +20,14 @@ public:
     void render(GLuint uniformModel, GLuint uniformSpecularIntensity, GLuint uniformShininess);
     bool checkCollision(double x, double y, double r);
     glm::vec2 getPos(){return pos;}
+    void setPos(GLfloat x, GLfloat y){pos = glm::vec2(x,y); }
     bool collected = false;
+    int id = 0;
 private:
     glm::vec2 pos;
     GLfloat size_food_radius;
     Model* food;
-    int id = 0;
+
 };
 
 #endif
