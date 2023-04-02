@@ -175,6 +175,7 @@ void Arena::checkCollision(Snake* s){
     s->endSpawn();
 
     if(s->selfCollisionCheck()){
+        s->kill();
         return;
     }
 

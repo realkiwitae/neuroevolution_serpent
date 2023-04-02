@@ -21,6 +21,7 @@
 #define game_snake_segment_radius .3f
 #define game_snake_health_bonus 10.f
 #define game_snake_health_decay .02f
+#define game_snake_fading_s 2.f 
 
 #define game_snakenn_nb_layers 3
 #define game_snakenn_data_size 24

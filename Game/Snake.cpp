@@ -37,14 +37,15 @@ void Snake::init(Model* model)
     angle = std::atan2(0.f, 12.f);
     score = 0.f;
     bIsAlive = true;
-    deathFade = 180.f;
     health = game_snake_health_bonus*3/2;
     age = 0.f;
 }
 
 void Snake::update(){
     if(!bIsAlive){
-        deathFade -= .6;
+        if(now - death_clock > game_snake_fading_s){
+            init(model_segment);
+        }
         return;
     }
     GLfloat velocity = game_arena_snake_speed * deltaTime;
@@ -127,11 +128,19 @@ void Snake::render(GLuint uniformModel, GLuint uniformSpecularIntensity, GLuint 
     //	shinyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
         model_segment->RenderModel();
     }
-
+    model = glm::mat4(1.0f);
+    glm::vec2 p(body[0].pos.x+cos(angle),body[0].pos.y+sin(angle));
+    model = glm::translate(model, glm::vec3(p.x,game_arena_floor_y+game_snake_segment_radius/2.f,p.y));
+    model = glm::scale(model, .3f*(game_snake_segment_radius/game_arena_food_radius)*glm::vec3(1.f, 1.f, 1.f));
+    glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+//	shinyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
+    model_segment->RenderModel();
 }
 
 void Snake::kill(){
     if(bspawning)return;
+    if(!bIsAlive)return;
+    death_clock = now;
     bIsAlive = false;
     score /=2.f;
 }
@@ -170,4 +179,10 @@ bool Snake::selfCollisionCheck(){
         }
     }
     return false;
+}
+
+void Snake::endSpawn(){
+    if(!bspawning)return;
+    bspawning = false;
+    std::cout << "Spawn snake OK at " << body[0].pos.x << " "<< body[0].pos.y << std::endl;
 }

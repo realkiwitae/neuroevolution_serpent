@@ -38,7 +38,7 @@ public:
     void addScore(GLfloat s);
     bool checkCollision(double x, double y, double r);
     bool selfCollisionCheck();
-    void endSpawn(){bspawning = false;};
+    void endSpawn();
 private:
     Model* model_segment;
     std::vector<Segment> body = {};
@@ -46,7 +46,7 @@ private:
     GLfloat angle;
     GLfloat score;
     GLfloat hue;
-    GLfloat deathFade = 180.f;
+    GLfloat death_clock;
     GLfloat health;
     bool bIsAI = false;
     bool bIsAlive;
