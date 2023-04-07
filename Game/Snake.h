@@ -34,16 +34,18 @@ public:
     bool isDead(){return !bIsAlive;}
     glm::vec2 getScreenCoord();
     glm::vec2 getPos(){return body[0].pos;}
+    std::vector<Segment> getBody(){return body;}
+    GLfloat angle;
     void possess(DNA* dna);
     void addScore(GLfloat s);
     bool checkCollision(double x, double y, double r);
     bool selfCollisionCheck();
     void endSpawn();
+    double inputs[3*2*game_arena_snake_FOV_DIVISION];
 private:
     Model* model_segment;
     std::vector<Segment> body = {};
     GLfloat age = 0.f;
-    GLfloat angle;
     GLfloat score;
     GLfloat hue;
     GLfloat death_clock;

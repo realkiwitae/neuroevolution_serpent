@@ -272,7 +272,7 @@ void GameLoop(){
 	nb_alive = 0;
 	for(size_t i = 0 ; i < game_snakenn_pool_size; i++)
 	{
-		arena.checkCollision(&snakeNNs[i]);
+		arena.updateInfo(&snakeNNs[i]);
 		nb_alive+=!snakeNNs[i].isDead();
 	}
 
@@ -289,7 +289,7 @@ void GameLoop(){
 // normal game
 
 	player.update();
-	arena.checkCollision(&player);
+	arena.updateInfo(&player);
 #endif
 }
 

@@ -98,7 +98,8 @@ bool Arena::update()
         bool b = true;
         while(b){
             b = false;
-            for(size_t j = 0; j < i; j++){
+            for(size_t j = 0; j < game_arena_food_nb; j++){
+                if(foods[j].id == foods[i].id)continue;
                 if(foods[i].checkCollision(foods[j].getPos().x,foods[j].getPos().y,3*game_arena_food_radius)){
                     b = true;
                     foods[i].init(food);
@@ -156,7 +157,12 @@ void Arena::render(GLuint uniformModel, GLuint uniformSpecularIntensity, GLuint 
     }
 }
 
-void Arena::checkCollision(Snake* s){
+struct s_thing{
+    double distance;
+    int type;
+};
+
+void Arena::updateInfo(Snake* s){
     // if(s->isDead())return;
     // glm::vec2 snake_pos = s->getPos();
 
@@ -182,28 +188,118 @@ void Arena::checkCollision(Snake* s){
     for(Food& f : foods){
         if(f.checkCollision(s->getPos().x,s->getPos().y,game_snake_segment_radius)){
             s->addScore(1.f);
-            f.init(food);
-            bool b = true;
-            while(b){
-                b = false;
-                for(size_t j = 0; j < game_arena_food_nb; j++){
-                    if(j == f.id)continue;
-                    if(f.checkCollision(foods[j].getPos().x,foods[j].getPos().y,3*game_arena_food_radius)){
-                        b = true;
-                        f.init(food);
-                        break;
-                    }
-                }
-                if(!b){
-                    if(s->checkCollision(f.getPos().x,f.getPos().y,game_arena_food_radius)){
-                        b = true;
-                        f.init(food);
-                        break;                        
-                    }
-                }
-
-            }
-    
         }
+    }
+    // Input feed
+   /*
+   For each FOV division add input for each type distance
+   */ 
+    for(int i = 0; i < game_arena_snake_FOV_DIVISION*3;i++){
+        s->inputs[i] = 0.;
+    }
+
+
+    s_thing input[2*game_arena_snake_FOV_DIVISION];
+    //init fogofwar
+    for(int i = 0; i < 2*game_arena_snake_FOV_DIVISION; i++){
+        input[i].distance = 9999.;
+        input[i].type = 9999;
+    }
+    //food
+    for (auto f : foods) {
+        double a = std::atan2(f.getPos().y - s->getPos().y , f.getPos().x - s->getPos().x);
+        a = std::fmod(a - s->angle, 2*M_PI);
+        double d = glm::distance(s->getPos(),f.getPos()) - game_arena_food_radius - game_snake_segment_radius;
+        if (a >= 0 && a < game_arena_snake_FOV/2) {
+            if (d < input[(int) (a * game_arena_snake_FOV_DIVISION / (game_arena_snake_FOV/2))].distance) {
+                input[(int) (a * game_arena_snake_FOV_DIVISION / (game_arena_snake_FOV/2))].distance = d;
+                input[(int) (a * game_arena_snake_FOV_DIVISION / (game_arena_snake_FOV/2))].type = E_TYPE_FOOD;
+            }
+        } else if (a <= 0 && -a < game_arena_snake_FOV/2) {
+            if (d < input[(int) (-a * game_arena_snake_FOV_DIVISION / (game_arena_snake_FOV/2)) + game_arena_snake_FOV_DIVISION].distance) {
+                input[(int) (-a * game_arena_snake_FOV_DIVISION / (game_arena_snake_FOV/2)) + game_arena_snake_FOV_DIVISION].distance = d;
+                input[(int) (-a * game_arena_snake_FOV_DIVISION / (game_arena_snake_FOV/2)) + game_arena_snake_FOV_DIVISION].type = E_TYPE_FOOD;
+            }
+        }
+    } 
+    // Body
+    auto b = s->getBody();
+    for (int i = 1 ; i < b.size();i++) {
+        double a = std::atan2(b[i].pos.y - s->getPos().y , b[i].pos.x - s->getPos().x);
+        a = std::fmod(a - s->angle, 2*M_PI);
+        double d = glm::distance(s->getPos(),b[i].pos) - 2*game_snake_segment_radius;
+        if (a >= 0 && a < game_arena_snake_FOV/2) {
+            if (d < input[(int) (a * game_arena_snake_FOV_DIVISION / (game_arena_snake_FOV/2))].distance) {
+                input[(int) (a * game_arena_snake_FOV_DIVISION / (game_arena_snake_FOV/2))].distance = d;
+                input[(int) (a * game_arena_snake_FOV_DIVISION / (game_arena_snake_FOV/2))].type = E_TYPE_SNAKE;
+            }
+        } else if (a <= 0 && -a < game_arena_snake_FOV/2) {
+            if (d < input[(int) (-a * game_arena_snake_FOV_DIVISION / (game_arena_snake_FOV/2)) + game_arena_snake_FOV_DIVISION].distance) {
+                input[(int) (-a * game_arena_snake_FOV_DIVISION / (game_arena_snake_FOV/2)) + game_arena_snake_FOV_DIVISION].distance = d;
+                input[(int) (-a * game_arena_snake_FOV_DIVISION / (game_arena_snake_FOV/2)) + game_arena_snake_FOV_DIVISION].type = E_TYPE_SNAKE;
+            }
+        }
+    }
+    // Wall
+    double section_size = game_arena_snake_FOV / (game_arena_snake_FOV_DIVISION*2);
+        // Calculate distances to walls for each section
+    for (int i = 0; i <  (game_arena_snake_FOV_DIVISION*2); i++) {
+        // Calculate section start and end angles
+        double start_angle = (s->angle - (game_arena_snake_FOV/2.0)) + i*section_size;
+        double end_angle = start_angle + section_size;
+        double a = (start_angle + end_angle)/2;
+             
+        // Calculate distances to walls for start and end angles
+        double dist_to_left_wall = INFINITY;
+        double dist_to_right_wall = INFINITY;
+        double dist_to_top_wall = INFINITY;
+        double dist_to_bottom_wall = INFINITY;
+        
+        if (start_angle <= M_PI_2 && end_angle >= 0.0) {
+            dist_to_left_wall = fabs(s->getPos().x / cos(start_angle));
+        }
+        
+        if (start_angle <= M_PI && end_angle >= M_PI_2) {
+            dist_to_top_wall = fabs(s->getPos().y / sin(start_angle));
+        }
+        
+        if (start_angle <= 3.0*M_PI_2 && end_angle >= M_PI) {
+            dist_to_right_wall = fabs((game_arena_width - s->getPos().x) / cos(end_angle));
+        }
+        
+        if (start_angle <= 2.0*M_PI && end_angle >= 3.0*M_PI_2) {
+            dist_to_bottom_wall = fabs((game_arena_height - s->getPos().y) / sin(end_angle));
+        }
+        
+        // Find minimum distance to a wall
+        double min_dist_to_wall = std::min({dist_to_left_wall, dist_to_right_wall, dist_to_top_wall, dist_to_bottom_wall});
+        
+        // Output result
+
+
+
+        std::cout << "Section "
+                << i+1 << " _ " << (int) (fabs(a) * game_arena_snake_FOV_DIVISION / (game_arena_snake_FOV/2)) + (a<0)*game_arena_snake_FOV_DIVISION <<": " << start_angle*180/M_PI << " " << end_angle*180/M_PI
+                <<" "<< min_dist_to_wall << std::endl;
+
+        if (a >= 0 && a < game_arena_snake_FOV/2) {
+            if (min_dist_to_wall < input[(int) (a * game_arena_snake_FOV_DIVISION / (game_arena_snake_FOV/2))].distance) {
+                input[(int) (a * game_arena_snake_FOV_DIVISION / (game_arena_snake_FOV/2))].distance = min_dist_to_wall;
+                input[(int) (a * game_arena_snake_FOV_DIVISION / (game_arena_snake_FOV/2))].type = E_TYPE_SNAKE;
+            }
+        } else if (a <= 0 && -a < game_arena_snake_FOV/2) {
+            if (min_dist_to_wall < input[(int) (-a * game_arena_snake_FOV_DIVISION / (game_arena_snake_FOV/2)) + game_arena_snake_FOV_DIVISION].distance) {
+                input[(int) (-a * game_arena_snake_FOV_DIVISION / (game_arena_snake_FOV/2)) + game_arena_snake_FOV_DIVISION].distance = min_dist_to_wall;
+                input[(int) (-a * game_arena_snake_FOV_DIVISION / (game_arena_snake_FOV/2)) + game_arena_snake_FOV_DIVISION].type = E_TYPE_SNAKE;
+            }
+        }
+
+
+    }
+    
+    for (int i = 0; i < game_arena_snake_FOV_DIVISION; i++) {
+        s->inputs[input[i].type * game_arena_snake_FOV_DIVISION * 2 + i] = SIGNAL_MULTIPLIER * (game_arena_snake_sighting_range - input[i].distance) / game_arena_snake_sighting_range;
+        s->inputs[input[i + game_arena_snake_FOV_DIVISION].type * game_arena_snake_FOV_DIVISION * 2 + game_arena_snake_FOV_DIVISION * 2 - 1 - i] = SIGNAL_MULTIPLIER
+                * (game_arena_snake_sighting_range - input[i + game_arena_snake_FOV_DIVISION].distance) / game_arena_snake_sighting_range;
     }
 }

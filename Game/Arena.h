@@ -18,7 +18,7 @@ public:
     void init();
     bool update();
     void render(GLuint uniformModel, GLuint uniformSpecularIntensity, GLuint uniformShininess);
-    void checkCollision(Snake* s);
+    void updateInfo(Snake* s);
 private:
     Food foods[game_arena_food_nb]; 
     Mesh *ground;
