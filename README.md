@@ -12,3 +12,11 @@ Wall collisions will be deadly, as for body collision with itselfs.
 A serpent will die if he does not eat for 10s.
 
 Every generation will breed new ones.
+
+
+
+-- Looks like im missing something for the input computation.
+I pause the project to make a clean ocv prototype where i am more familiar with dbg draws.
+Will come back to it after solving the issue.
+
+TBD
